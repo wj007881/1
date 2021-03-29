@@ -9,7 +9,7 @@
 </mt-header>
 
 
-      <div v-for="(stories) in newes.stories" :key="stories.id" >
+      <div v-for="(stories) in funs.stories" :key="stories.id" >
           <div  v-for="(images) in stories.images" :key="images.id"  >
           <h1>{{stories.title}}</h1>
           <h4>{{stories.litletitle}}</h4>
@@ -31,8 +31,8 @@
           <mt-radio style="height:320px;width:300px;text-align:center;"  v-model="value" align="center" :options="['涉及政治', '辱骂信息', '其他举报']"> 
           </mt-radio>
           <textarea type='text'  class='report_area' v-model="report"></textarea>
-          <mt-button style="float:left" type="primary" size="large" @click.stop="reported(pluns)">提交</mt-button>
-          <mt-button style="float:right" type="danger" size="large" @click.stop="cancel">取消</mt-button>
+          <mt-button style="float:left" type="primary" size="normal" @click.stop="reported(pluns)">提交</mt-button>
+          <mt-button style="float:right" type="danger" size="normal" @click.stop="cancel">取消</mt-button>
           </mt-popup>
           </div>
           <div  class='comment left'>{{pluns.plun+""}} </div> 
@@ -79,7 +79,7 @@ export default {
    
     computed: mapState({
       index: state => state.index,
-      newes:state => state.newes,
+      funs:state => state.funs,
       user1:state => state.user1,
   }),
   
@@ -196,6 +196,7 @@ export default {
                      else {
                        MessageBox.alert('举报失败', '提示');
                      }
+                    
             })
             .catch((error) => {
                  console.log(error);
@@ -255,7 +256,7 @@ export default {
                    "auth":this.mydata,
                    "plun":this.plv,
                    "like":0,
-                   "newsId":this.newes.id,  
+                   "funsId":this.newes.id,  
              })
                .then((response)=>  {
                      if (response.status==200){
@@ -298,15 +299,16 @@ export default {
       this.mydata.push(mylogin);
       this.myuser=myuserid;
            
-      let baseurl="http://111.230.88.27:3000/api/v1/news/";
-      var piurl=baseurl+this.newes.id+"/stories";
-      var plcount=baseurl+this.newes.id+"/stories/count"
+      let baseurl="http://111.230.88.27:3000/api/v1/funs/";
+      var piurl=baseurl+this.funs.id+"/stories";
+      var plcount=baseurl+this.funs.id+"/stories/count"
       this.axios.get(piurl)
                 .then((response) => {  
-                      this.items.push(response.data);
                       if(response.data=="")  {
                           this.showp=true;
-                      }             
+                      }    
+                      this.items.push(response.data);
+                               
                 })
                 .catch((error) => {
                   console.log(error);
@@ -316,12 +318,13 @@ export default {
                        var data= response.data;
                     for(var index in data){
                           this.plcount=data.count
+                          console.log(error);
                        }
                       if(response.data=="")  {    
                       }             
                 })
                 .catch((error) => {
-                  console.log(error);
+                  
                 });
     
       
@@ -329,7 +332,7 @@ export default {
   },
 }
 </script>
-<style >
+<style scoped>
 body,p,strong,span{
   line-height: 2em;
 }

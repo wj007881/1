@@ -5,14 +5,19 @@ Vue.use(Vuex)
 export default new Vuex.Store({
     state: {
         stories:"",
-        loginID: 0,
+        loginID: "",
         check:0,
         checkid:0,
-        show:true
+        funs:"",
+        newes:"",
+        video:"",
+        user1:"",
+        saveid:"",
+        boxs:""
     },
     mutations: {
         changeState (state,json) {
-            console.log(json)
+            console.log(json);
             for(var name in json){
                 state[name] = json[name];
             }

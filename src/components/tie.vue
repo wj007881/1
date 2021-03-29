@@ -1,41 +1,21 @@
 <template>
 
 <div >
-  <mt-header title="资讯详情" style="border-radius:10px">
+  <mt-header title="详情">
   
-    <mt-button  @click="back()"  slot="left">返回</mt-button>
-  
-  <mt-button  slot="right" @click="more()">更多</mt-button>
-</mt-header>
-
-
-      <div v-for="(stories) in newes.stories" :key="stories.id" >
-          <div  v-for="(images) in stories.images" :key="images.id"  >
-          <h1>{{stories.title}}</h1>
-          <h4>{{stories.litletitle}}</h4>
-          </div>
-          <div  v-html="stories.body">
-          </div>
-          </div>
-
-    <div >
+    <mt-button  @click="back()" slot="left" >返回</mt-button>
+ 
+    <mt-button  slot="right" @click="more()">更多</mt-button>
+</mt-header>    
+          <h1>{{tie.title}}</h1>
+          <p>{{tie.body}}</p>
+    <div>
         <div class='message_title'>
 			<span>评论区</span>
 		</div>
-		 
-		
-          <div class='comment' v-for="(plun,index) in items" :key="plun.id" v-if="index<3" ><!-- 此行v-if不bi生效 -->
+		<div class='comment' v-for="(plun,index) in items" :key="plun.id" v-if="index<3" ><!-- 此行v-if不bi生效 -->
           <div  class="text" v-for="(pluns,index) in plun" :key="pluns.id"  v-if="index<3" @click="toPls()"><!-- 此行v-if设置评论只显示前三条 -->
-          <div  class='text-right' @click.stop="openreport"><a>report</a>
-          <mt-popup style="border-radius:20px;" v-model="popupVisible" pop-transition="popup-fade" closeOnClickModal='false'>
-          <mt-radio style="height:320px;width:300px;text-align:center;"  v-model="value" align="center" :options="['涉及政治', '辱骂信息', '其他举报']"> 
-          </mt-radio>
-          <textarea type='text'  class='report_area' v-model="report"></textarea>
-          <mt-button style="float:left" type="primary" size="large" @click.stop="reported(pluns)">提交</mt-button>
-          <mt-button style="float:right" type="danger" size="large" @click.stop="cancel">取消</mt-button>
-          </mt-popup>
-          </div>
-          <div  class='comment left'>{{pluns.plun+""}} </div> 
+          <div  class='comment left'>{{pluns.plun+""}}</div> 
           <div  class='text-right'>by <a href="#non">{{pluns.auth+''}}</a>
            <a v-show="likeshow"><img src="../assets/like.png" @click.stop="like(pluns)" style="height:50px">{{pluns.like}}</a>
            <a v-show="unlikeshow">取消<img src="../assets/unlike.png" @click.stop="unlike(pluns)" style="height:50px">{{pluns.like}}</a>
@@ -45,55 +25,45 @@
          
           </div>
 
-          <span style="font-size: 30px;" v-show="this.showp">无人评论</span>
+          <span v-show="this.showp">无人评论</span>
         <textarea type='text'  class='info_area' v-model="pl"></textarea>
 		<button class='submit_btn' @click='written()'>评论</button>
 		<button class='submit_btn' @click='save()'>添加到我的收藏</button>
 		
 </div>
+		
+
   </div>
 </template>
 <script>
 
-import { Indicator } from 'mint-ui';
-import { mapState } from 'vuex';
-import { MessageBox } from 'mint-ui';
+import { mapState } from 'vuex'
 export default {
     data () {
         return {
           items:[],
           comment:[],
-          likeshow:true,
-          unlikeshow:false,
-          showp:false,
           pl:[],
-          report:[],
-          plv:[],
-          mydata:[],
-          myuser:'',
-          plcount:3,
-          value:"",
-          popupVisible:false,
+          showp:true
         }
     },
-   
+    
     computed: mapState({
       index: state => state.index,
-      newes:state => state.newes,
-      user1:state => state.user1,
+      show:state => state.show,
+      tie:state => state.tie
   }),
   
   methods:{
     back:function(){
-      
-      Indicator.open('加载中...');
-      setTimeout(() => {
-        Indicator.close();
-      }, 300);
+      this.$store.commit({
+        type: 'changeState',
+        show:true
+      })
       this.$router.go(-1)
     },
     more:function(){
-       MessageBox.alert('更多功能敬请期待', '提示');
+      
     },
     toPls:function(){
       this.$router.push("./pls")
@@ -102,11 +72,12 @@ export default {
       if(this.mydata==""){
                   MessageBox.alert('请登录', '提示');
              }
-             else{
+             else{   
              this.axios.post('http://111.230.88.27:3000/api/v1/saves',{
                    "stories":this.newes.stories,
                    "saveid":this.newes.id,
                    "xbuserid":this.myuser,
+                    
              })
                .then((response)=>  {
                      if (response.status==200){
@@ -141,6 +112,7 @@ export default {
                         
                 this.axios.get('http://111.230.88.27:3000/api/v1/stories')
                 .then((response) => {  
+                    
                     this.items.length = 0;
                     this.items.push(response.data);
                       if(response.data=="")  {
@@ -174,9 +146,11 @@ export default {
       if(this.mydata==""){
                   MessageBox.alert('请登录', '提示');
              }
+             
              else{
                if(this.value==""){
-                 MessageBox.alert('请选择举报内容', '提示'); 
+                 MessageBox.alert('请选择举报内容', '提示');
+                 
                 }
                else{
                  if(this.value=="其他举报"&&this.report==""){
@@ -196,6 +170,7 @@ export default {
                      else {
                        MessageBox.alert('举报失败', '提示');
                      }
+                    
             })
             .catch((error) => {
                  console.log(error);
@@ -203,14 +178,23 @@ export default {
                 });
                  }
                }
-                }      
+
+                } 
+               
+                
+                  
+            
+           
+           
+           
     },
     unlike:function(pluns){
       if(this.mydata==""){
                   MessageBox.alert('请登录', '提示');
              }
              else{
-                 var unlike=pluns.like-1    
+                 var unlike=pluns.like-1
+                 
              this.axios.patch('http://111.230.88.27:3000/api/v1/stories',{
                    "like":unlike,
                    "id":pluns.id 
@@ -236,6 +220,7 @@ export default {
                      else {
                        MessageBox.alert('取消点赞失败，请检查网络', '提示');
                      }
+                    
             })
             .catch((error) => {
                  MessageBox.alert('网络未连接', '提示');
@@ -276,7 +261,8 @@ export default {
                      }
                      else {
                        MessageBox.alert('评论失败', '提示');
-                     }     
+                     }
+                    
             })
             .catch((error) => {
                  console.log(error);
@@ -291,25 +277,27 @@ export default {
           callback: action => {
           }
         }); */
+        /* this.$alert(stories.title, stories.title, {
+          confirmButtonText: '确定',
+          width:1500,
+          height:300,
+          callback: action => {
+          }
+        }); */
   },
-  mounted() {
+  mounted() { 
+      var baseurl="http://111.230.88.27:3000/api/v1/tie/"
+      var piurl=baseurl+this.tie.id+"/stories"
+      var plcount=baseurl+this.tie.id+"/stories/count"
       var mylogin=localStorage.getItem("mylogin");
       var myuserid=localStorage.getItem("myuserid");
-      this.mydata.push(mylogin);
-      this.myuser=myuserid;
-           
-      let baseurl="http://111.230.88.27:3000/api/v1/news/";
-      var piurl=baseurl+this.newes.id+"/stories";
-      var plcount=baseurl+this.newes.id+"/stories/count"
       this.axios.get(piurl)
                 .then((response) => {  
                       this.items.push(response.data);
-                      if(response.data=="")  {
-                          this.showp=true;
-                      }             
+                      console.log(this.items)
+                        this.showp=true;                
                 })
-                .catch((error) => {
-                  console.log(error);
+                .catch((error) => { 
                 });
       this.axios.get(plcount)
                 .then((response) => {  
@@ -317,22 +305,18 @@ export default {
                     for(var index in data){
                           this.plcount=data.count
                        }
-                      if(response.data=="")  {    
+                      
+                      if(response.data=="")  {
+                          
                       }             
                 })
                 .catch((error) => {
                   console.log(error);
                 });
-    
-      
-             
-  },
+  }
 }
 </script>
-<style >
-body,p,strong,span{
-  line-height: 2em;
-}
+<style scoped>
   .img-wrap {
     position: relative;
     overflow: hidden;
@@ -357,16 +341,10 @@ body,p,strong,span{
     position: absolute;
     bottom: 10px;
     z-index: 1;
-    font-size: 30px;
+    font-size: 12px;
     color: rgba(255,255,255,.6);
     right: 40px;
     text-shadow: 0px 1px 2px rgba(0,0,0,.3);
-  }
-  .avatar{
-    width: 100%;
-  }
-  .content-image{
-    width: 100%;
   }
   .img-mask {
     position: absolute;
@@ -380,43 +358,21 @@ body,p,strong,span{
     background: -ms-linear-gradient(top, rgba(0,0,0,0) 25%,rgba(0,0,0,0.6) 100%);
     background: linear-gradient(to bottom, rgba(0,0,0,0) 25%,rgba(0,0,0,0.6) 100%);
     filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00000000', endColorstr='#99000000',GradientType=0 );
-    font-size: 30px;
-    line-height: 35px;
   }
   .stroies-image {
     width: 100%;
-    font-size: 30px;
-    line-height: 35px;
   }
 body {
     background-color: #e4e4e4;
-    font-size: 30px;
-    line-height: 5.1rem;
 }
-.btn{
-  float:left;
-  font-size: 30px;
-}
+
 .hide {
     display: none;
 }
 
-.bg {
-    position: absolute;
-    top: 0%;
-    left: 0%;
-    width: 100%;
-    height: 100%;
-    background-color: black;
-    z-index: 1;
-    -moz-opacity: 0.7;
-    opacity: .70;
-    filter: alpha(opacity=70);
-}
-
 .message_title {
     background-color: #00BFFF;
-    height: 50px;
+    height: 60px;
     padding: 0 0.5rem;
     font-size: 35px;
     line-height: 3.5rem;
@@ -435,7 +391,7 @@ body {
     resize : none;
 }
 .report_area{
-    width: 350px;
+    width: 90%;
     margin: 0 auto;
     display: block;
     height: 40%;
@@ -445,7 +401,7 @@ body {
     resize : none;
 }
 .submit_btn {
-    width:240px;
+    width:250px;
     height: 70px;
     font-size: 30px;
     background-color: #00BFFF;
@@ -458,7 +414,6 @@ body {
 
 .main {
     height: 100%;
-   
 }
 
 .text-right {
@@ -472,5 +427,11 @@ body {
     border-radius: 5px;
     background: #fff;
     font-size: 35px;
+}
+h1{
+    font-size: 80px
+}
+p{
+    font-size: 50px
 }
 </style>

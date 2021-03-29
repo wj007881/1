@@ -1,22 +1,108 @@
 <template>
-<div>
-  <div class='message_title'>
+
+<div >
+  <mt-header title="活动详情">
+  
+    <mt-button  slot="left" @click="back()" >返回</mt-button>
+  
+  <mt-button  slot="right" @click="more()"></mt-button>
+</mt-header>
+
+      
+          <h1>{{newes.title}}</h1>
+          <h4>{{newes.litletitle}}</h4>
+          <div v-html="newes.body">
+          </div>
+
+       <div >
+        <div class='message_title'>
 			<span>评论区</span>
 		</div>
-		<textarea type='text'  class='info_area'></textarea>
-		<span class='text_center btn_style'>
-		<button class='submit_btn' @click='written'>评论</button>
+		 
 		
-		</span>
+          <div class='comment' v-for="(plun,index) in items" :key="plun.id" v-if="index<3" ><!-- 此行v-if不bi生效 -->
+          <div  class="text" v-for="(pluns,index) in plun" :key="pluns.id"  v-if="index<3" @click="toPls()"><!-- 此行v-if设置评论只显示前三条 -->
+          <div  class='text-right' @click.stop="openreport"><a>report</a>
+          <mt-popup style="border-radius:20px;" v-model="popupVisible" pop-transition="popup-fade" closeOnClickModal='false'>
+          <mt-radio style="height:320px;width:300px;text-align:center;"  v-model="value" align="center" :options="['涉及政治', '辱骂信息', '其他举报']"> 
+          </mt-radio>
+          <textarea type='text'  class='report_area' v-model="report"></textarea>
+          <mt-button style="float:left" type="primary" size="normal" @click.stop="reported(pluns)">提交</mt-button>
+          <mt-button style="float:right" type="danger" size="normal" @click.stop="cancel">取消</mt-button>
+          </mt-popup>
+          </div>
+          <div  class='comment left'>{{pluns.plun+""}} </div> 
+          <div  class='text-right'>by <a href="#non">{{pluns.auth+''}}</a>
+           <a v-show="likeshow"><img src="../assets/like.png" @click.stop="like(pluns)" style="height:50px">{{pluns.like}}</a>
+           <a v-show="unlikeshow">取消<img src="../assets/unlike.png" @click.stop="unlike(pluns)" style="height:50px">{{pluns.like}}</a>
+          </div>
+          </div>
+          
+         
+          </div>
+
+          <span style="font-size: 30px;" v-show="this.showp">无人评论</span>
+        <textarea type='text'  class='info_area' v-model="pl"></textarea>
+		<button class='submit_btn' @click='written()'>评论</button>
+		<button class='submit_btn' @click='save()'>添加到我的收藏</button>
+		
 </div>
+
+  </div>
 </template>
 <script>
+
+import { mapState } from 'vuex'
 export default {
+    data () {
+        return {
+          items:[],
+          comment:[],
+        }
+    },
+    
+    computed: mapState({
+      index: state => state.index,
+      show:state => state.show,
+      newes:state => state.newes
+  }),
   
+  methods:{
+    back:function(){
+      this.$store.commit({
+        type: 'changeState',
+        show:true
+      })
+      this.$router.push('./find')
+    },
+    more:function(){
+      alert("1")
+    }
+        /* this.$alert(stories.title, stories.title, {
+          confirmButtonText: '确定',
+          width:1500,
+          height:300,
+          callback: action => {
+          }
+        }); */
+  },
+  mounted() { 
+      var baseurl="http://111.230.88.27:3000/api/v1/news/"
+      var piurl=baseurl+this.newes.id+"/stories"
+      this.axios.get(piurl)
+                .then((response) => {  
+                      this.items.push(response.data);
+                      console.log(this.items)                 
+                })
+                .catch((error) => {
+                  this.show2=true;
+                  
+                });
+  },
 }
 </script>
-<style>
-.img-wrap {
+<style scoped>
+  .img-wrap {
     position: relative;
     overflow: hidden;
   }
@@ -253,4 +339,3 @@ option {
     left: 0;
 }
 </style>
-

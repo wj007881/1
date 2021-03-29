@@ -10,7 +10,7 @@ function resolve (dir) {
 
 module.exports = {
   entry: {
-    app: './src/main.js'
+    app: ['./src/main.js','babel-polyfill']
   },
   output: {
     path: config.build.assetsRoot,
@@ -24,6 +24,7 @@ module.exports = {
     alias: {
       'vue$': 'vue/dist/vue.esm.js',
       '@': resolve('src'),
+      'directives': path.resolve(__dirname, '../src/directives')
     }
   },
   module: {
@@ -36,7 +37,7 @@ module.exports = {
       {
         test: /\.js$/,
         loader: 'babel-loader',
-        include: [resolve('src'), resolve('test')]
+        include: [resolve('src'), resolve('test'),resolve('./vuex/store.js')]
       },
       {
         test: /\.(png|jpe?g|gif|svg)(\?.*)?$/,

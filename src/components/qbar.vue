@@ -1,89 +1,98 @@
 <template>
   <div >
-    <mt-tab-container class="page-tabbar-container" v-model="selected">  
+    <div class="clear"></div>
+    <mt-tab-container class="page-tabbar-container" v-model="selected1">  
         <mt-tab-container-item id="首页">  
-          
         </mt-tab-container-item>  
-        <mt-tab-container-item id="商城">  
-           <shop></shop>   
+
+
+        <mt-tab-container-item id="发现">    
         </mt-tab-container-item>  
-        <mt-tab-container-item id="发现">  
-          <find></find> 
-        </mt-tab-container-item>  
-        <mt-tab-container-item id="收藏">  
-          <div class="page-part">  
-           <!-- cell -->  
-            <myzoom></myzoom>   
-          </div>  
-          <router-link to="/">  
-           <!-- button -->  
-            <mt-button type="danger" size="large">退出</mt-button>  
-          </router-link>  
+
+        <mt-tab-container-item id="空间">  
         </mt-tab-container-item>  
       </mt-tab-container> 
   
-      <mt-tabbar v-model="selected" fixed >  
-      <mt-tab-item id="首页" >  
-        <img slot="icon" src="../assets/logo.png">  
-        首页  
+      <mt-tabbar  v-model="selected1" fixed >
+      <mt-tab-item id="首页" >
+        <div @click="shou()" >
+         
+        <img slot="icon" src="../assets/index.png">
+        </div> 
+        <a class="pfont">首页</a>
       </mt-tab-item>  
-      <mt-tab-item id="商城">  
-        <img slot="icon" src="../assets/logo.png">  
-        商城  
-      </mt-tab-item>  
-      <mt-tab-item id="发现">  
-        <img slot="icon" src="../assets/logo.png">  
-        发现  
-      </mt-tab-item>  
-      <mt-tab-item id="收藏">  
-        <img slot="icon" src="../assets/logo.png">  
-        我的收藏
-      </mt-tab-item>  
+     
+
+       <mt-tab-item id="消息" > 
+        <div @click="box()" > 
+       
+            <img slot="icon" src="../assets/box.png" >
+        </div>   
+        <a class="pfont">消息</a>
+      </mt-tab-item>    
+      
+       
+      <mt-tab-item id="空间" >
+        <div @click="myzoom()"  >  
+         <img slot="icon" src="../assets/myzoom.png" >
+        </div> 
+        <a class="pfont">空间</a>
+      </mt-tab-item>   
     </mt-tabbar>   
   </div>
 </template>
 
 <script>
 
-import shop from "./shop.vue"
-import find from "./find.vue"
-import myzoom from "./myzoom.vue"
-import { mapState } from 'vuex'
 export default {
    name: 'app',
   data () {
     return {
-      selected: '首页' 
+      selected1: '' ,
     }
   },
    methods: {
-            makeActive: function(item, index){
+            shop: function(){
+                this.selected1="商城"
                 
-		    
-                      
+		       
+                },
+            find: function(){
+                this.selected1="发现"
+               
+ 
+                },
+            shou: function(){
+                this.selected1="首页"
+                
+ 
+                },
+            myzoom: function(){
+              this.selected1="空间"
+                
+ 
+                },
+            
+            box: function(){
+              this.selected1="论坛"
+                
+ 
                 }
             },
           
-    components:{
-    shop,find,myzoom
-  },
-  computed: mapState({
-      index: state => state.index,
-      stories: state => state.stories,
-      show:state => state.show,
-  }),
+   
+  
         }
 
 </script>
 
-<style>
+<style scoped>
 #app {
   font-family: 'Avenir', Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
-  margin-top: 60px;
 }
 #body{
   font-family: 'Avenir', Hmtvetica, Arial, sans-serif;
@@ -91,7 +100,12 @@ export default {
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
-  margin-top: 60px;
 }
 
+.clear{
+  clear: both;
+}
+.pfont{
+  font-size: 25px
+}
 </style>

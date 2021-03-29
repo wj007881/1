@@ -1,63 +1,81 @@
 <template>
 <div>
     <mt-header >
-  <router-link to="/" slot="left">
-    <mt-button  @click="back()" >返回</mt-button>
-  </router-link>
+ 
+    <mt-button  @click="back()" slot="left" >返回</mt-button>
+  
   <router-link to="/sign" slot="right">
-  <mt-button  @click="more()"></mt-button>
+  <mt-button  >注册</mt-button>
   </router-link>
 </mt-header>
      <div class="login-wrap" >
-      <h1>登录</h1>
-      <p v-show="showTishi">{{tishi}}</p>
-      <input type="text" placeholder="请输入用户名" v-model="username">
-      <input type="password" placeholder="请输入密码" v-model="password">
-      <mt-button type="primary" @click='submitForm'>登陆</mt-button>
+      <h1>登录页</h1>
+
+     <mt-field label="用户名" placeholder="请输入用户名" state="error1" v-model="username"></mt-field>
+     <mt-field label="密  码" placeholder="请输入密码" type="password"  state="error3" v-model="password"></mt-field>
+      <mt-button type="primary" size="large" @click='submitForm'>登陆</mt-button>
+
+
+      <mt-button type="primary" size="large"  @click='toSign'>去注册</mt-button>
     </div>
 
 </div>
 </template>
 <script>
 import axios from 'axios';
+import { mapState } from 'vuex'
+import { Indicator } from 'mint-ui';
 import VueRouter from 'vue-router';
+import { MessageBox } from 'mint-ui';
 const router = new VueRouter();
 export default {
   data () {
     return {
-                 ruleForm: {
-                    username: '',
-                    password: ''
-                }
-             }
-  },
+            username: '',
+            password: '',
+            mydata:[],
+            users:[]          
+             }},
+   computed: mapState({
+      index: state => state.index,
+      stories: state => state.stories,
+      loginID:state => state.loginID
+
+    }),
+
          methods: {
+           back:function(){
+              this.$store.commit({
+              type: 'changeState',
+              show:true
+              })
+              Indicator.open('加载中...');
+              setTimeout(() => {
+                Indicator.close();
+              }, 300);
+              this.$router.go(-1)
+            },
+            toSign:function(){
+              this.$router.push("./sign")
+            },
             submitForm:function() {
-               axios.post("http://localhost:3000/tea_login",{
-                   'code':this.ruleForm.username,
-                   'password':this.ruleForm.password,
+                  //登录
+                  this.axios.get("/weibo-api/oauth2/authorize",{
+                   'client_id':1056921024,
+                   "redirect_uri":"https://open.weibo.cn/oauth2/authorize/default.html",
+                   
                })
                 .then((response)=>  {
-                    if(response.data.success == true){
-                        this.$store.commit("changeState",{
-                          loginID:this.ruleForm.username  
-                        })
-                        alert("登陆成功");
-                        return;
-                    } if(response.data.description == 3){
-                        alert('请检查密码');
-                        return;
-                    } if(response.data.description == 4){
-                        alert(code)
-                        alert('请检查用户名');
-                        return;
-                    }
-                          }) 
-                        },
-}
+                     console.log(response)
+            }).catch((response)=>  {
+                     if (response.status!=200)   {
+                        
+                     }
+                          })
+}}
     }
 </script>
-<style>
+<style scoped>
 #body{
   font-family: 'Avenir', Hmtvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -69,6 +87,12 @@ export default {
 
 h1, h2 {
   font-weight: normal;
+  font-size: 80px
+}
+.input{
+  height: 150px;
+  width: 500px;
+  font-size:50px
 }
 
 ul {
@@ -81,9 +105,7 @@ li {
   margin: 0 10px;
 }
 
-a {
-  color: #42b983;
-}
+
  .text {
     font-size: 14px;
   }
@@ -93,9 +115,6 @@ a {
   }
   .login-wrap{text-align:center;}
   h3{margin: 10px auto 20px}
-  input{display:block; width:250px; height:40px; line-height:40px; margin:0 auto; margin-bottom: 10px; outline:none; border:1px solid #888; padding:10px; box-sizing:border-box;}
-  p{color:red;}
-  button{display:block; width:250px; height:40px; line-height: 40px; margin:0 auto; border:none; background-color:#41b883; color:#fff; font-size:16px; margin-bottom:5px;}
   span{cursor:pointer;}
   span:hover{color:#41b883;}
   .link{text-decoration: underline}
